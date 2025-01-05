@@ -5,6 +5,18 @@ window.addEventListener("DOMContentLoaded", () => {
     const searchBtn = document.getElementById('search-btn');
     const cityInput = document.getElementById('city-input');
 
+    // Event listener for search button
+    searchBtn.addEventListener('click', () => {
+        const city = cityInput.value.trim();
+        if (city) {
+            getWeatherByCity(city);
+            saveToLocalStorage(city); // Save searched city
+        } else {
+            weatherInfo.innerHTML = `<p class="text-red-500">Please enter a city name.</p>`;
+        }
+        });
+
+        
     // Function to fetch weather data by city
     async function getWeatherByCity(city) {
     try {
@@ -31,34 +43,25 @@ window.addEventListener("DOMContentLoaded", () => {
         `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`
         );
         const data = await response.json();
-        
+
         displayForecast(data);
+        
     } catch (error) {
         forecast.innerHTML = `<p class="text-red-500">Error fetching forecast.</p>`;
     }
     }
 
-    // Event listener for search button
-    searchBtn.addEventListener('click', () => {
-    const city = cityInput.value.trim();
-    if (city) {
-        getWeatherByCity(city);
-        saveToLocalStorage(city); // Save searched city
-    } else {
-        weatherInfo.innerHTML = `<p class="text-red-500">Please enter a city name.</p>`;
-    }
-    });
 
     // Display current weather data
     function displayWeather(data) {
     const { name, main, weather, wind } = data;
     weatherInfo.innerHTML = `
         <div class="bg-white bg-opacity-80 p-6 rounded-lg shadow-lg text-gray-900">
-        <h2 class="text-3xl font-bold">${name}</h2>
-        <p class="text-lg">${weather[0].description}</p>
-        <p class="text-2xl font-bold">Temperature: ${main.temp}°C</p>
-        <p>Humidity: ${main.humidity}%</p>
-        <p>Wind Speed: ${wind.speed} m/s</p>
+            <h2 class="text-3xl font-bold">${name}</h2>
+            <p class="text-lg">${weather[0].description}</p>
+            <p class="text-2xl font-bold">Temperature: ${main.temp}°C</p>
+            <p>Humidity: ${main.humidity}%</p>
+            <p>Wind Speed: ${wind.speed} m/s</p>
         </div>
     `;
     }
@@ -72,12 +75,12 @@ window.addEventListener("DOMContentLoaded", () => {
         const date = new Date(item.dt_txt).toLocaleDateString();
         const cardHTML = `
             <div class="bg-white bg-opacity-80 p-4 rounded-lg shadow-lg text-gray-900 text-center">
-            <h3 class="font-bold text-lg">${new Date(item.dt_txt).toLocaleString('en-US', { weekday: 'long' })}</h3>
-            <p class="text-sm">${date}</p>
-            <img src="http://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png" alt="weather-icon" class="mx-auto">
-            <p class="text-xl font-bold">${item.main.temp}°C</p>
-            <p>Wind: ${item.wind.speed} m/s</p>
-            <p>Humidity: ${item.main.humidity}%</p>
+                <h3 class="font-bold text-lg">${new Date(item.dt_txt).toLocaleString('en-US', { weekday: 'long' })}</h3>
+                <p class="text-sm">${date}</p>
+                <img src="http://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png" alt="weather-icon" class="mx-auto">
+                <p class="text-xl font-bold">${item.main.temp}°C</p>
+                <p>Wind: ${item.wind.speed} m/s</p>
+                <p>Humidity: ${item.main.humidity}%</p>
             </div>
         `;
         forecast.innerHTML += cardHTML;
@@ -99,8 +102,8 @@ window.addEventListener("DOMContentLoaded", () => {
     function updateRecentCitiesDropdown() {
     const cities = JSON.parse(localStorage.getItem('recentCities')) || [];
     if (cities.length > 0) {
-        let dropdownHTML = '<select id="recent-cities" class="border p-2 rounded-lg">';
-        dropdownHTML += '<option>Select a city</option>';
+        let dropdownHTML = '<select id="recent-cities" class="border p-2 rounded-lg ">';
+        dropdownHTML += '<option class="">Select a city</option>';
         cities.forEach((city) => {
         dropdownHTML += `<option>${city}</option>`;
         });
@@ -119,5 +122,3 @@ window.addEventListener("DOMContentLoaded", () => {
     window.onload = updateRecentCitiesDropdown;
 
 })
-
-
